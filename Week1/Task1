@@ -1,9 +1,10 @@
 import re
 
+
 def domain_name(url):
     url_start = "^\"?(https?:\/\/www\.|https?:\/\/|www\.)"
     match = re.search(url_start, url)
-    if not match == None:
+    if match is not None:
         domain = re.sub(match.group(), '', url)
         domain = domain.split(".")[0]
         return domain

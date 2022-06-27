@@ -15,7 +15,7 @@ def main():
 
     domain = domain_name(url)
     if not domain == 1:
-        print("domain_name = " + domain)
+        print("domain name = " + domain)
     else:
         print("Not a valid URL")
 

@@ -6,66 +6,81 @@
 import itertools
 import re
 
-WORD = "banana"
-DASH = "-"
-DASHES_QTY = 0
-# Составление шаблона для фильтра результатов по искомому слову
-TEMPLATE = "[a-z]?"
-for i in range(len(WORD)):
-    TEMPLATE += WORD[i]
-    if not i == len(WORD) - 1:
-        TEMPLATE += "(-+)?"
-TEMPLATE += "[a-z]?"
+source = "banana"
+wordmap = {}
+sourcemap = {}
 
 
 def main():
-    # Для проверки
-    assert bananas("banann") == set()
-    assert bananas("banana") == {"banana"}
-    assert bananas("bbananana") == {"b-an--ana", "-banana--", "-b--anana",
-                                    "b-a--nana", "-banan--a", "b-ana--na",
-                                    "b---anana", "-bana--na", "-ba--nana",
-                                    "b-anan--a", "-ban--ana", "b-anana--"}
-    assert bananas("bananaaa") == {"banan-a-", "banana--", "banan--a"}
-    assert bananas("bananana") == {"ban--ana", "ba--nana", "bana--na",
-                                   "b--anana", "banana--", "banan--a"}
     # Запрос ввода у пользователя
-    source = input()
-    # Вызов функции bananas
-    result = bananas(source)
+    word = input()
+    result = bananas(word)
     # Печать отсортированного результата
-    for i in sorted(result, reverse=True):
-        print(i)
+    print(set(sorted(result)))
+
+
+# Функция для разделения слов на буквы и составления буквенной карты
+def split_word(s):
+    map = {}
+    temp = []
+    for i in range(len(s)):
+        if s[i] not in map:
+            letter = s[i]
+            temp.append(i)
+            j = i + 1
+            while j < len(s):
+                if s[j] == letter:
+                    temp.append(j)
+                j += 1
+            map[letter] = temp
+            temp = []
+    return map
 
 
 def bananas(s) -> set:
-    # Определить количество дефисов для замены лишних букв
-    DASHES_QTY = len(s) - len(WORD)
     result = set()
-    # Скомбинировать все возможные варианты размещения дефиса в слове
-    for i in itertools.product((True, False), repeat=len(s)):
-        string = "".join(letter if val else DASH for letter, val in zip(s, i))
-        # Отфильтровать только те варианты,
-        # из которых можно составить нужное слово
-        if re.search(TEMPLATE, string):
-            result.add(string)
-    delete_items = []
-    # Отфильтровать результаты с лишними буквами
-    for i in result:
-        count = 0
-        for j in range(len(i)):
-            if i[j] == "-":
-                count += 1
-        if not count == DASHES_QTY:
-            delete_items.append(i)
-    # Удалить лишние результаты
-    for i in range(len(delete_items)):
-        result.remove(delete_items[i])
-    # Вернуть результат, либо пустой набор
-    if not result:
-        return set()
-    else:
-        return set(result)
+    # Составление буквенных карт для искомого и введённого слова
+    wordmap = split_word(s)
+    sourcemap = split_word(source)
+    pattern = "[a-z]?b(-+)?a(-+)?n(-+)?a(-+)?n(-+)?a[a-z]?"
+    # Получение всех возможных сочетаний позиций для каждой буквы
+    for i in wordmap:
+        wordmap[i] = list(itertools.combinations(wordmap[i],
+                          len(sourcemap[i])))
+    # Получение всех возможных сочетаний букв
+    wordmap = list(itertools.product(*wordmap.values()))
+    combos = []
+    # Запись сочетаний в буквеннов виде
+    for i in range(len(wordmap)):
+        temp = []
+        for j in range(len(source)):
+            match = False
+            for k in range(len(wordmap[i])):
+                for l in range(len(wordmap[i][k])):
+                    if ((source[j] == s[wordmap[i][k][l]]) and
+                            (not str(wordmap[i][k][l]) in temp)):
+                        if len(temp) > 1:
+                            if int(temp[len(temp) - 1]) > int(wordmap[i][k][l]):
+                                break
+                        temp.append(str(wordmap[i][k][l]))
+                        match = True
+                    if match:
+                        break
+                if match:
+                    break
+        if (len(temp) == len(source)):
+            combos.append(temp)
+    # Фильтрация результатов, не соответствующих искомому слова
+    for i in range(len(combos)):
+        temp = ""
+        for j in range(len(s)):
+            if str(j) in combos[i]:
+                temp += s[j]
+            else:
+                temp += "-"
+        if re.search(pattern, temp):
+            result.add(temp)
+    return result
 
 if __name__ == "__main__":
     main()

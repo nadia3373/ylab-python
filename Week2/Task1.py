@@ -7,11 +7,14 @@
 
 from itertools import cycle
 
+
 class CyclicIterator:
     def __init__(self, container):
         self.container = cycle(container)
+
     def __iter__(self):
         return self
+
     def __next__(self):
         for item in self.container:
             return item

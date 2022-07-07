@@ -1,4 +1,5 @@
 import random
+import re
 
 BOARD_SIZE = 10
 LOSE_SEQUENCE_LENGTH = 5
@@ -42,11 +43,16 @@ def game():
     print('Введите адрес ячейки в формате "строка столбец", чтобы сделать ход')
     while len(computer_moves) + len(user_moves) < BOARD_SIZE ** 2:
         while True:
-            user_move = input().split()
-            if not validate_move(user_move):
+            pattern = "^[0-9] [0-9]$"
+            user_move = input()
+            if not re.match(pattern, user_move):
                 print("Некорректный ход")
             else:
-                break
+                user_move = user_move.split()
+                if not validate_move(user_move):
+                    print("Некорректный ход")
+                else:
+                    break
         user_move = (user_move[0], user_move[1])
         user_moves.append(user_move)
         # После хода пользвателя проверить, нет ли среди ходов проигрышной комбинации
@@ -114,6 +120,7 @@ def validate_move(move):
     if move[0].isdigit() and move[1].isdigit():
         move[0] = int(move[0])
         move[1] = int(move[1])
+        move = (int(move[0]), int(move[1]))
         if move[0] >= 0 and move[0] < BOARD_SIZE and move[1] >= 0 and move[1] < BOARD_SIZE:
             if not move in user_moves and not move in computer_moves:
                 return True

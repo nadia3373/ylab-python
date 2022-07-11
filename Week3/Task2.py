@@ -13,7 +13,8 @@ import time
 
 
 def delay_function(func):
-    def wrapper(number, call_count, start_sleep_time, factor, border_sleep_time):
+    def wrapper(number, call_count, start_sleep_time,
+                factor, border_sleep_time):
         count = 1
         sleep_time = start_sleep_time
         while count <= call_count:
@@ -31,17 +32,20 @@ def delay_function(func):
             # Вызов декорируемой функции.
             result = func(number)
             # Печать результата.
-            print("Запуск номер " + str(count) + ". Ожидание: " + str(sleep_time) + " секунд. Результат декорируемой функции = " + str(result))
+            print("Запуск номер " + str(count) + ". Ожидание: " + str(sleep_time) +
+                  " секунд. Результат декорируемой функции = " + str(result))
             count += 1
         print("Конец работы")
     return wrapper
+
 
 @delay_function
 def multiplier(number: int):
     return number * 2
 
 if __name__ == "__main__":
-    # Если при запуске программы были переданы аргументы, попробовать использовать их.
+    # Если при запуске программы были переданы аргументы,
+    # попробовать использовать их.
     if len(sys.argv) == 5:
         float_pattern = "\d+.\d+"
         for i in range(1, len(sys.argv)):
@@ -51,7 +55,8 @@ if __name__ == "__main__":
                 factor = float(sys.argv[3])
                 border_sleep_time = float(sys.argv[4])
             except:
-                print("Количество вызовов функции должно быть целым числом. Остальные аргументы должны быть целыми или дробными числами.")
+                print("Количество вызовов функции должно быть целым числом. "
+                      "Остальные аргументы должны быть целыми или дробными числами.")
                 exit()
     # Иначе использовать аргументы по умолчанию.
     elif len(sys.argv) == 1:

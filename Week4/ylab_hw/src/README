@@ -1,6 +1,0 @@
-Задание: надо написать логику авторизаций пользователей на основе JWT-токенов.
-К существующему проекту: https://github.com/BernarBerdikul/ylab_hw/tree/main/webinar_num_3.
-
-Команды для запуска:
-docker-compose -f ./docker-compose.yml up -d
-alembic upgrade head

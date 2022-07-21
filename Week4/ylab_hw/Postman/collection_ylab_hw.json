@@ -425,9 +425,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{APIURL}}/api/v1/logout",
+					"raw": "{{LOCAL_URL}}/api/v1/logout",
 					"host": [
-						"{{APIURL}}"
+						"{{LOCAL_URL}}"
 					],
 					"path": [
 						"api",
@@ -534,9 +534,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{APIURL}}/api/v1/logout_all",
+					"raw": "{{LOCAL_URL}}/api/v1/logout_all",
 					"host": [
-						"{{APIURL}}"
+						"{{LOCAL_URL}}"
 					],
 					"path": [
 						"api",

@@ -1,0 +1,551 @@
+{
+	"info": {
+		"_postman_id": "ea7cad6d-f6c2-4e48-b767-6bfedf100afe",
+		"name": "ylab homework 4 auth app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22000979"
+	},
+	"item": [
+		{
+			"name": "Просмотр списка постов",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/posts",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Регистрируется на сайте",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomUsername = pm.variables.replaceIn('{{$randomUserName}}');\r",
+							"const randomPassword = pm.variables.replaceIn('{{$randomPassword}}');\r",
+							"const randomEmail = pm.variables.replaceIn('{{$randomExampleEmail}}');\r",
+							"\r",
+							"pm.environment.set(\"test_username\", randomUsername);\r",
+							"pm.environment.set(\"test_password\", randomPassword);\r",
+							"pm.environment.set(\"test_email\", randomEmail);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"{{test_username}}\",\r\n    \"email\": \"{{test_email}}\",\r\n    \"password\": \"{{test_password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/signup",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Заходит на сайт",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var responseJSON = JSON.parse(responseBody);\r",
+							"\r",
+							"tests['Response contains \"access_token\" property'] = responseJSON.hasOwnProperty('access_token');\r",
+							"tests['Response contains \"refresh_token\" property'] = responseJSON.hasOwnProperty('refresh_token');\r",
+							"\r",
+							"if(tests['Response contains \"access_token\" property']) {\r",
+							"    pm.environment.set('access_token', responseJSON.access_token);\r",
+							"}\r",
+							"if(tests['Response contains \"refresh_token\" property']) {\r",
+							"    pm.environment.set('refresh_token', responseJSON.refresh_token);\r",
+							"}\r",
+							"\r",
+							"tests['Environment variable \"access_token\" has been set'] = pm.environment.get('access_token') === responseJSON.access_token;\r",
+							"tests['Environment variable \"refresh_token\" has been set'] = pm.environment.get('refresh_token') === responseJSON.refresh_token;\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"pr_zoom@mail.ru\",\r\n    \"password\": \"Qwerty123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/login",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Обновляет токен",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var responseJSON = JSON.parse(responseBody);\r",
+							"\r",
+							"tests['Response contains \"access_token\" property'] = responseJSON.hasOwnProperty('access_token');\r",
+							"tests['Response contains \"refresh_token\" property'] = responseJSON.hasOwnProperty('refresh_token');\r",
+							"\r",
+							"if(tests['Response contains \"access_token\" property']) {\r",
+							"    pm.environment.set('access_token', responseJSON.access_token);\r",
+							"}\r",
+							"if(tests['Response contains \"refresh_token\" property']) {\r",
+							"    pm.environment.set('refresh_token', responseJSON.refresh_token);\r",
+							"}\r",
+							"\r",
+							"tests['Environment variable \"access_token\" has been set'] = pm.environment.get('access_token') === responseJSON.access_token;\r",
+							"tests['Environment variable \"refresh_token\" has been set'] = pm.environment.get('refresh_token') === responseJSON.refresh_token;\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{refresh_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/refresh",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Смотрит свои профиль",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/users/me",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Создает Пост",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Post 1\",\r\n    \"description\": \"That's my description\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/posts",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Обновляет информацию о себе",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody);\r",
+							"\r",
+							"tests['Response contains \"user\" property'] = responseJSON.hasOwnProperty('user');\r",
+							"\r",
+							"var user = responseJSON.user || {};\r",
+							"\r",
+							"tests['User has \"uuid\" property'] = user.hasOwnProperty('uuid');\r",
+							"tests['User has \"username\" property'] = user.hasOwnProperty('username');\r",
+							"tests['User has \"email\" property'] = user.hasOwnProperty('email');\r",
+							"tests['User has \"is_superuser\" property'] = user.hasOwnProperty('is_superuser');\r",
+							"tests['User has \"created_at\" property'] = user.hasOwnProperty('created_at');\r",
+							"\r",
+							"\r",
+							"tests['Response contains \"access_token\" property'] = responseJSON.hasOwnProperty('access_token');\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomUsername = pm.variables.replaceIn('{{$randomUserName}}');\r",
+							"const randomEmail = pm.variables.replaceIn('{{$randomExampleEmail}}');\r",
+							"\r",
+							"pm.environment.set(\"test_username\", randomUsername);\r",
+							"pm.environment.set(\"test_email\", randomEmail);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": {{test_username}},\r\n    \"email\": \"{{test_email}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/users/me",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Выйти из аккаунта",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APIURL}}/api/v1/logout",
+					"host": [
+						"{{APIURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Повторно заходит на сайт",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var responseJSON = JSON.parse(responseBody);\r",
+							"\r",
+							"tests['Response contains \"access_token\" property'] = responseJSON.hasOwnProperty('access_token');\r",
+							"tests['Response contains \"refresh_token\" property'] = responseJSON.hasOwnProperty('refresh_token');\r",
+							"\r",
+							"if(tests['Response contains \"access_token\" property']) {\r",
+							"    pm.environment.set('access_token', responseJSON.access_token);\r",
+							"}\r",
+							"if(tests['Response contains \"refresh_token\" property']) {\r",
+							"    pm.environment.set('refresh_token', responseJSON.refresh_token);\r",
+							"}\r",
+							"\r",
+							"tests['Environment variable \"access_token\" has been set'] = pm.environment.get('access_token') === responseJSON.access_token;\r",
+							"tests['Environment variable \"refresh_token\" has been set'] = pm.environment.get('refresh_token') === responseJSON.refresh_token;\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"pr_zoom@mail.ru\",\r\n    \"password\": \"Qwerty123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LOCAL_URL}}/api/v1/login",
+					"host": [
+						"{{LOCAL_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Выйти со всех устройств",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Success answer\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APIURL}}/api/v1/logout_all",
+					"host": [
+						"{{APIURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"logout_all"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

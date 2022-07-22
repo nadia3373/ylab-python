@@ -142,10 +142,13 @@ class UserService(UserMixin):
 
     def decode_request_header(self, request: Request) -> str:
         """Расшифровка заголовка авторизации."""
-        token = request.headers.get('Authorization')
-        token = token.split(" ")
-        token = token[1]
-        return token
+        try:
+            token = request.headers.get('Authorization')
+            token = token.split(" ")
+            token = token[1]
+            return token
+        except:
+            return None
 
     def update_user_info(self, username: str, data: UserUpdate) -> UModel:
         """Обновление информации о пользователе."""

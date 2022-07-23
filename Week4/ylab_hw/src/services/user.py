@@ -97,7 +97,7 @@ class UserService(UserMixin):
             type="access",
             user_uuid=user_id,
             nbf=current_time,
-            exp=current_time + int(ACCESS_TOKEN_EXPIRE_MINUTES),
+            exp=current_time + int(ACCESS_TOKEN_EXPIRE_MINUTES) * 60,
             refresh_uuid=refresh_uuid,
             username=user.username,
             email=user.email,

@@ -42,8 +42,8 @@ def log_user_in(user: User, user_service=Depends(get_user_service)) -> Tokens:
 def refresh(request: Request, user_service=Depends(get_user_service)):
     """Функция обновления токенов."""
     token: str = user_service.decode_request_header(request)
-    try:
-        token: RefreshToken = user_service.decode_refresh_token(token)
+    token: RefreshToken = user_service.decode_refresh_token(token)
+    if token:
         if user_service.check_if_refresh_token_valid(token):
             user_service.remove_refresh_token(token["jti"], token["user_uuid"])
             user: UModel = user_service.create_response(user_uuid=token["user_uuid"])
@@ -54,11 +54,8 @@ def refresh(request: Request, user_service=Depends(get_user_service)):
             refr_token: str = user_service.create_refresh_token(user, refresh_uuid, current_time)
             tokens = Tokens(access_token=acc_token, refresh_token=refr_token)
             return tokens
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Incorrect token.")
-    except:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Token not found or incorrect, please log in again.")
+    raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
+                        detail="User is not logged in or refresh token has expired.Please log in again.")
 
 
 @router.get(
@@ -71,8 +68,8 @@ def refresh(request: Request, user_service=Depends(get_user_service)):
 def show_user_info(request: Request, user_service=Depends(get_user_service)) -> dict:
     """Функция просмотра своего профиля."""
     token: str = user_service.decode_request_header(request)
-    try:
-        token: AccessToken = user_service.decode_token(token)
+    token: AccessToken = user_service.decode_token(token)
+    if token:
         if user_service.check_if_refresh_token_valid(token) and user_service.check_if_access_token_valid(token):
             user: UModel = user_service.create_response(user=token["username"])
             delattr(user, "is_totp_enabled")
@@ -83,11 +80,11 @@ def show_user_info(request: Request, user_service=Depends(get_user_service)) -> 
             return resp
         elif user_service.check_if_access_token_valid(token) is False and user_service.check_if_refresh_token_valid(token) is False:
             return {"msg": "Log in to see this page."}
-        else:
-            return {"msg": "Token is incorrect or expired."}
-    except:
+        elif user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is True:
+            return {"msg": "Access token has expired. Please refresh."}
+    else:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Access token is incorrect.")
+                            detail="User is not logged in or access token has expired. Please log in or refresh.")
 
 
 @router.patch(
@@ -100,15 +97,15 @@ def show_user_info(request: Request, user_service=Depends(get_user_service)) -> 
 def update_user_info(request: Request, data: UserUpdate, user_service=Depends(get_user_service)) -> dict:
     """Функция обновления информации о себе."""
     token: str = user_service.decode_request_header(request)
-    try:
-        token: AccessToken = user_service.decode_token(token)
+    token: AccessToken = user_service.decode_token(token)
+    if token:
         access_uuid = str(uuid_pkg.uuid4())
         refresh_uuid = token["refresh_uuid"]
         current_time = int(datetime.utcnow().timestamp())
         if user_service.check_if_access_token_valid(token) and user_service.check_if_access_token_valid(token):
             user: UModel = user_service.update_user_info(token["username"], data)
             if not user:
-                return {"msg: User data not valid."}
+                    return {"msg: User data not valid."}
             delattr(user, "is_totp_enabled")
             delattr(user, "password")
             delattr(user, "is_active")
@@ -120,11 +117,12 @@ def update_user_info(request: Request, data: UserUpdate, user_service=Depends(ge
             return resp
         elif user_service.check_if_access_token_valid(token) is False and user_service.check_if_refresh_token_valid(token) is False:
             return {"msg": "Log in to see this page."}
-        else:
-            return {"msg": "Token is incorrect or expired."}
-    except:
+        elif user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is True:
+            return {"msg": "Access token has expired. Please refresh."}
+    else:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Incorrect token.")
+                            detail="User is not logged in or access token has expired. Please log in or refresh.")
+
 
 
 @router.post(
@@ -137,8 +135,8 @@ def update_user_info(request: Request, data: UserUpdate, user_service=Depends(ge
 def logout(request: Request, user_service=Depends(get_user_service)):
     """Функция выхода из профиля."""
     token: str = user_service.decode_request_header(request)
-    try:
-        token: AccessToken = user_service.decode_token(token)
+    token: AccessToken = user_service.decode_token(token)
+    if token:
         if user_service.check_if_access_token_valid(token) and user_service.check_if_refresh_token_valid(token):
             user_service.block_access_token(token["jti"])
             refresh_uuid = token["refresh_uuid"]
@@ -146,12 +144,12 @@ def logout(request: Request, user_service=Depends(get_user_service)):
             if user_service.remove_refresh_token(token=refresh_uuid, user_id=user_uuid):
                 return {"msg": "You have been logged out."}
         elif user_service.check_if_access_token_valid(token) is False and user_service.check_if_refresh_token_valid(token) is False:
-            return {"msg": "User has already been logged out."}
-        else:
-            return {"msg": "Token is incorrect or expired."}
-    except:
+            return {"msg": "User is not logged in."}
+        elif user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is True:
+            return {"msg": "Access token has expired. Please refresh."}
+    else:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Access token is incorrect.")
+                            detail="User is not logged in or access token has expired. Please log in or refresh.")
 
 
 @router.post(
@@ -164,17 +162,17 @@ def logout(request: Request, user_service=Depends(get_user_service)):
 def logout_all(request: Request, user_service=Depends(get_user_service)):
     """Функция выхода со всех устройств."""
     token: str = user_service.decode_request_header(request)
-    try:
-        token: AccessToken = user_service.decode_token(token)
+    token: AccessToken = user_service.decode_token(token)
+    if token:
         if user_service.check_if_access_token_valid(token) and user_service.check_if_refresh_token_valid(token):
             user_service.block_access_token(token["jti"])
             user_uuid = token["user_uuid"]
             if user_service.remove_refresh_token(token=None, user_id=user_uuid):
                 return {"msg": "You have been logged out from all devices."}
         elif user_service.check_if_access_token_valid(token) is False and user_service.check_if_refresh_token_valid(token) is False:
-            return {"msg": "User has already been logged out."}
-        else:
-            return {"msg": "User has already been logged out from all devices."}
-    except:
+            return {"msg": "User is not logged in."}
+        elif user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is True:
+            return {"msg": "Access token has expired. Please refresh."}
+    else:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Access token is incorrect.")
+                            detail="User is not logged in or access token has expired. Please log in or refresh.")

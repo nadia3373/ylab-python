@@ -55,7 +55,7 @@ def refresh(request: Request, user_service=Depends(get_user_service)):
             tokens = Tokens(access_token=acc_token, refresh_token=refr_token)
             return tokens
     raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                        detail="User is not logged in or refresh token has expired.Please log in again.")
+                        detail="User is not logged in or refresh token has expired. Please log in again.")
 
 
 @router.get(

@@ -97,7 +97,7 @@ class UserService(UserMixin):
             type="access",
             user_uuid=user_id,
             nbf=current_time,
-            exp=current_time + int(ACCESS_TOKEN_EXPIRE_MINUTES) * 60,
+            exp=current_time + int(ACCESS_TOKEN_EXPIRE_MINUTES),
             refresh_uuid=refresh_uuid,
             username=user.username,
             email=user.email,
@@ -130,15 +130,21 @@ class UserService(UserMixin):
 
     def decode_token(self, token: str) -> AccessToken:
         """Расшифровка access_token."""
-        decoded_token: AccessToken = jwt.decode(token, JWT_SECRET_KEY,
-                                                algorithms=[JWT_ALGORITHM])
-        return decoded_token
+        try:
+            decoded_token: AccessToken = jwt.decode(token, JWT_SECRET_KEY,
+                                                    algorithms=[JWT_ALGORITHM])
+            return decoded_token
+        except:
+            return None
 
     def decode_refresh_token(self, token: str) -> RefreshToken:
         """Расшифровка refresh_token."""
-        decoded_token: RefreshToken = jwt.decode(token, JWT_SECRET_KEY,
-                                                 algorithms=[JWT_ALGORITHM])
-        return decoded_token
+        try:
+            decoded_token: RefreshToken = jwt.decode(token, JWT_SECRET_KEY,
+                                                    algorithms=[JWT_ALGORITHM])
+            return decoded_token
+        except:
+            return None
 
     def decode_request_header(self, request: Request) -> str:
         """Расшифровка заголовка авторизации."""

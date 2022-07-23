@@ -58,17 +58,18 @@ def post_create(
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST,
                             detail="Incorrect data.")
     token: str = user_service.decode_request_header(request)
-    try:
-        token: AccessToken = user_service.decode_token(token)
+    token: AccessToken = user_service.decode_token(token)
+    if token:
         if user_service.check_if_access_token_valid(token) and user_service.check_if_refresh_token_valid(token):
             user_id = token["user_uuid"]
             post: dict = post_service.create_post(post=post, user_uuid=user_id)
             return PostModel(**post)
         elif user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is False:
-            return {"msg": "Log in to create a post"}
-        else:
-            raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                                detail="Token is expired or incorrect.")
-    except:
+            return {"msg": "Log in to create a post."}
+        elif user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is True:
+            return {"msg": "Access token has expired. Please refresh."}
+        print(user_service.check_if_access_token_valid(token)is False and user_service.check_if_refresh_token_valid(token) is True)
+    else:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-                            detail="Log in to create a post.")
+                            detail="User is not logged in or access token has expired. Please log in or refresh.")
+ 

@@ -12,8 +12,7 @@ import redis
 
 
 # Соединение с БД
-storage = redis.Redis(host="redis-16878.c8.us-east-1-2.ec2.cloud.redislabs.com",
-                      port=16878, password="jgnCd3lntIlFTWhCy98bvShp1f2Vqjqu")
+storage = redis.Redis(host="YOUR-REDIS-DB-HOST, password="YOUR-REDIS-DB-PASSWORD")
 
 
 def cache_value(func):
